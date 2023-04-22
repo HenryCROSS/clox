@@ -8,5 +8,5 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
 
 set(SOURCES main.c debug.c chunk.c memory.c)
 set(HEADERS debug.h chunk.h memory.h common.h)
-target_sources(clox PRIVATE ${SOURCES} ${HEADERS})
+target_sources(clox.out PRIVATE ${SOURCES} ${HEADERS})
 # set_target_properties(clox PROPERTIES C_STANDARD 99)
