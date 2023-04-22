@@ -6,11 +6,14 @@ project(
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(clox.out)
+add_executable(clox)
+set_target_properties(clox
+  PROPERTIES
+  OUTPUT_NAME "clox"
+  SUFFIX ".out")
 
-target_include_directories(clox.out PRIVATE "${PROJECT_SOURCE_DIR}")
+target_include_directories(clox PRIVATE "${PROJECT_SOURCE_DIR}")
 
 # compile executable code
 add_subdirectory(src)
-
 
