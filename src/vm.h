@@ -10,7 +10,7 @@ typedef struct
 {
     Chunk* chunk;
     uint8_t* ip; // instruction pointer, JVM call it "PC" stands for program counter
-    Value stack[STACK_MAX];
+    Value stack[STACK_MAX]; // stack based vm
     Value* stackTop;
 } VM;
 
