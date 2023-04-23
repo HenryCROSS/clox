@@ -4,8 +4,6 @@ project(
   VERSION 1.0.0
   LANGUAGES C)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
-
 set(SOURCES main.c debug.c chunk.c memory.c value.c)
 set(HEADERS debug.h chunk.h memory.h common.h value.h)
 target_sources(clox PRIVATE ${SOURCES} ${HEADERS})

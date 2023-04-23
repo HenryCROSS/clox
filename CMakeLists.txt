@@ -7,6 +7,11 @@ project(
 set(CMAKE_C_STANDARD 11)
 
 add_executable(clox)
+target_compile_options(clox PRIVATE
+  $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
+  $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic>
+)
+
 set_target_properties(clox
   PROPERTIES
   OUTPUT_NAME "clox"
