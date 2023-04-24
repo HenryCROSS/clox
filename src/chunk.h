@@ -4,6 +4,7 @@
 #include "common.h"
 #include "value.h"
 
+// the byte code
 typedef enum
 {
     OP_CONSTANT,
