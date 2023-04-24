@@ -23,7 +23,7 @@ INTERPRET_RUNTIME_ERROR
 
 void initVM();
 void freeVM();
-InterpretResult interpret(Chunk* chunk);
+InterpretResult interpret(const char* chunk);
 void push(Value value);
 Value pop();
 
