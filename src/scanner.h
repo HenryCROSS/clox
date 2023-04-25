@@ -1,14 +1,6 @@
 #ifndef CLOX_SCANNER_H
 #define CLOX_SCANNER_H
 
-typedef struct
-{
-    TokenType type;
-    const char *start;
-    int length;
-    int line;
-} Token;
-
 typedef enum
 {
     // Single-character tokens.
@@ -57,6 +49,14 @@ typedef enum
     TOKEN_ERROR,
     TOKEN_EOF
 } TokenType;
+
+typedef struct
+{
+    TokenType type;
+    const char *start;
+    int length;
+    int line;
+} Token;
 
 void initScanner(const char *source);
 Token scanToken();
