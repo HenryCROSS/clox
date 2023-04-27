@@ -41,7 +41,7 @@ static void errorAt(Token *token, const char *message)
 
 static void errorAtCurrent(const char *message)
 {
-    errorAt(&parser.current.message);
+    errorAt(&parser.current, message);
 }
 
 static void advance()
