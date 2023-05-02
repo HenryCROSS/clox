@@ -5,6 +5,10 @@
 #include "compiler.h"
 #include "scanner.h"
 
+#ifdef DEBUG_PRINT_CODE
+#include "debug.h"
+#endif
+
 typedef struct
 {
     Token current;
@@ -70,7 +74,7 @@ static void errorAt(Token *token, const char *message)
     parser.hadError = true;
 }
 
-static void error(const char* message)
+static void error(const char *message)
 {
     errorAt(&parser.previous, message);
 }
@@ -141,10 +145,16 @@ static void emitConstant(Value value)
 static void endCompiler()
 {
     emitReturn();
+#ifdef DEBUG_PRINT_CODE
+    if (!parser.hadError)
+    {
+        disassembleChunk(currentChunk(), "code");
+    }
+#endif
 }
 
 static void expression();
-static ParseRule* getRule(TokenType type);
+static ParseRule *getRule(TokenType type);
 static void parsePrecedence(Precedence precedence);
 
 static void binary()
@@ -247,9 +257,25 @@ ParseRule rules[] = {
 
 static void parsePrecedence(Precedence precedence)
 {
+    advance();
+    ParseFn prefixRule = getRule(parser.previous.type)->prefix;
+    if (prefixRule == NULL)
+    {
+        error("Expect expression.");
+        return;
+    }
+
+    prefixRule();
+
+    while (precedence <= getRule(parser.current.type)->precedence)
+    {
+        advance();
+        ParseFn infixRule = getRule(parser.previous.type)->infix;
+        infixRule();
+    }
 }
 
-static ParseRule* getRule(TokenType type)
+static ParseRule *getRule(TokenType type)
 {
     return &rules[type];
 }
