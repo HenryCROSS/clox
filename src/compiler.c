@@ -70,6 +70,11 @@ static void errorAt(Token *token, const char *message)
     parser.hadError = true;
 }
 
+static void error(const char* message)
+{
+    errorAt(&parser.previous, message);
+}
+
 static void errorAtCurrent(const char *message)
 {
     errorAt(&parser.current, message);
