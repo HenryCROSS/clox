@@ -289,6 +289,11 @@ static void expression()
 bool compile(const char *source, Chunk *chunk)
 {
     initScanner(source);
+    compilingChunk = chunk;
+
+    parser.hadError = false;
+    parser.panicMode = false;
+
     advance();
     expression();
     consume(TOKEN_EOF, "Expect end of expression.");
