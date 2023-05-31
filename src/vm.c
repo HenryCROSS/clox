@@ -1,3 +1,4 @@
+#include <stdarg.h>
 #include <stdio.h>
 
 #include "common.h"
@@ -10,6 +11,20 @@ VM vm;
 static void resetStack()
 {
     vm.stackTop = vm.stack;
+}
+
+static void runtimeError(const char* format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    vfprintf(stderr, format, args);
+    va_end(args);
+    fputs("\n", stderr);
+
+    size_t instruction = vm.ip - vm.chunk->code - 1;
+    int line = vm.chunk->lines[instruction];
+    fprintf(stderr, "[line %d] in script\n", line);
+    resetStack();
 }
 
 void initVM()
@@ -31,6 +46,11 @@ Value pop()
 {
     vm.stackTop--;
     return *vm.stackTop;
+}
+
+static Value peek(int distance)
+{
+    return vm.stackTop[-1 - distance]; // 0 is the top, and decrease
 }
 
 static InterpretResult run()
@@ -69,17 +89,26 @@ static InterpretResult run()
         case OP_ADD:
             BINARY_OP(+);
             break;
+
         case OP_SUBTRACT:
             BINARY_OP(-);
             break;
+
         case OP_MULTIPLY:
             BINARY_OP(*);
             break;
+
         case OP_DIVIDE:
             BINARY_OP(/);
             break;
+
         case OP_NEGATE:
-            push(-pop());
+            if (!IS_NUMBER(peek(0)))
+            {
+                runtimeError("Operand must be a number.");
+                return INTERPRET_RUNTIME_ERROR;
+            }
+            push(NUMBER_VAL(-AS_NUMBER(pop())));
             break;
         case OP_RETURN: {
             printValue(pop());
@@ -94,13 +123,14 @@ static InterpretResult run()
 #undef BINARY_OP
 }
 
-InterpretResult interpret(const char* source)
+InterpretResult interpret(const char *source)
 {
     Chunk chunk;
     initChunk(&chunk);
 
     // compile to byte code
-    if(!compile(source, &chunk)) {
+    if (!compile(source, &chunk))
+    {
         freeChunk(&chunk);
         return INTERPRET_COMPILE_ERROR;
     }
