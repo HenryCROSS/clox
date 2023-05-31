@@ -53,6 +53,11 @@ static Value peek(int distance)
     return vm.stackTop[-1 - distance]; // 0 is the top, and decrease
 }
 
+static bool isFalsey(Value value)
+{
+    return IS_NIL(value) || (IS_BOOL(value) && !AS_BOOL(value));
+}
+
 static InterpretResult run()
 {
 #define READ_BYTE() (*vm.ip++)
@@ -113,6 +118,10 @@ static InterpretResult run()
             break;
         case OP_DIVIDE:
             BINARY_OP(NUMBER_VAL, /);
+            break;
+
+        case OP_NOT:
+            push(BOOL_VAL(isFalsey(pop())));
             break;
 
         case OP_NEGATE:
