@@ -12,6 +12,7 @@ typedef struct
     uint8_t* ip; // instruction pointer, JVM call it "PC" stands for program counter
     Value stack[STACK_MAX]; // stack based vm
     Value* stackTop;
+    Obj* objects;
 } VM;
 
 typedef enum
@@ -20,6 +21,8 @@ INTERPRET_OK,
 INTERPRET_COMPILE_ERROR,
 INTERPRET_RUNTIME_ERROR
 } InterpretResult;
+
+extern VM vm;
 
 void initVM();
 void freeVM();
