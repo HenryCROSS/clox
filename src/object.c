@@ -8,9 +8,9 @@
 
 #define ALLOCATE_OBJ(type, objectType) (type *)allocateObject(sizeof(type), objectType)
 
-static Obj* allocateObject(size_t size, ObjType type)
+static Obj *allocateObject(size_t size, ObjType type)
 {
-    Obj* object = (Obj*) reallocate(NULL, 0, size);
+    Obj *object = (Obj *)reallocate(NULL, 0, size);
     object->type = type;
     return object;
 }
@@ -29,4 +29,14 @@ ObjString *copyString(const char *chars, int length)
     memcpy(heapChars, chars, length);
     heapChars[length] = '\0';
     return allocateString(heapChars, length);
+}
+
+void printObject(Value value)
+{
+    switch (OBJ_TYPE(value))
+    {
+    case OBJ_STRING:
+        printf("%s", AS_CSTRING(value));
+        break;
+    }
 }
