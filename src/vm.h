@@ -2,6 +2,7 @@
 #define CLOX_VM_H
 
 #include "chunk.h"
+#include "table.h"
 #include "value.h"
 
 #define STACK_MAX 256
@@ -12,6 +13,7 @@ typedef struct
     uint8_t* ip; // instruction pointer, JVM call it "PC" stands for program counter
     Value stack[STACK_MAX]; // stack based vm
     Value* stackTop;
+    Table strings;
     Obj* objects;
 } VM;
 
