@@ -109,12 +109,15 @@ static void consume(TokenType type, const char *message)
     errorAtCurrent(message);
 }
 
-static bool check(TokenType type) {
+static bool check(TokenType type)
+{
     return parser.current.type == type;
 }
 
-static bool match(TokenType type) {
-    if (!check(type)) return false;
+static bool match(TokenType type)
+{
+    if (!check(type))
+        return false;
     advance();
     return true;
 }
@@ -341,26 +344,63 @@ static void expression()
     parsePrecedence(PREC_ASSIGNMENT);
 }
 
-static void expressionStatement() {
+static void expressionStatement()
+{
     expression();
     consume(TOKEN_SEMICOLON, "Expect ';' after expression.");
     emitByte(OP_POP);
 }
 
-static void printStatement() {
+static void printStatement()
+{
     expression();
     consume(TOKEN_SEMICOLON, "Expect ';' after value");
     emitByte(OP_PRINT);
 }
 
-static void declaration() {
-    statement();
+static void synchronize()
+{
+    parser.panicMode = false;
+
+    while (parser.current.type != TOKEN_SEMICOLON)
+    {
+        if (parser.previous.type == TOKEN_SEMICOLON)
+            return;
+        switch (parser.current.type)
+        {
+        case TOKEN_CLASS:
+        case TOKEN_FUN:
+        case TOKEN_VAR:
+        case TOKEN_FOR:
+        case TOKEN_IF:
+        case TOKEN_WHILE:
+        case TOKEN_PRINT:
+        case TOKEN_RETURN:
+            return;
+
+        default:;
+        }
+
+        advance();
+    }
 }
 
-static void statement() {
-    if(match(TOKEN_PRINT)) {
+static void declaration()
+{
+    statement();
+
+    if (parser.panicMode)
+        synchronize();
+}
+
+static void statement()
+{
+    if (match(TOKEN_PRINT))
+    {
         printStatement();
-    } else {
+    }
+    else
+    {
         expressionStatement();
     }
 }
@@ -376,7 +416,8 @@ bool compile(const char *source, Chunk *chunk)
 
     advance();
 
-    while (!match(TOKEN_EOF)) {
+    while (!match(TOKEN_EOF))
+    {
         declaration();
     }
 
