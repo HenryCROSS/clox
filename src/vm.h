@@ -13,6 +13,7 @@ typedef struct
     uint8_t* ip; // instruction pointer, JVM call it "PC" stands for program counter
     Value stack[STACK_MAX]; // stack based vm
     Value* stackTop;
+    Table globals;
     Table strings;
     Obj* objects;
 } VM;
