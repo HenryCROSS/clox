@@ -408,7 +408,7 @@ static void synchronize()
 {
     parser.panicMode = false;
 
-    while (parser.current.type != TOKEN_SEMICOLON)
+    while (parser.current.type != TOKEN_EOF)
     {
         if (parser.previous.type == TOKEN_SEMICOLON)
             return;
