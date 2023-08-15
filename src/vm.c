@@ -5,8 +5,8 @@
 #include "common.h"
 #include "compiler.h"
 #include "debug.h"
-#include "object.h"
 #include "memory.h"
+#include "object.h"
 #include "table.h"
 #include "vm.h"
 
@@ -183,9 +183,14 @@ static InterpretResult run()
             }
             push(NUMBER_VAL(-AS_NUMBER(pop())));
             break;
-        case OP_RETURN: {
+        case OP_PRINT: {
             printValue(pop());
             printf("\n");
+            break;
+        }
+        case OP_RETURN: {
+            /* printValue(pop()); */
+            /* printf("\n"); */
             return INTERPRET_OK;
         }
         }
