@@ -17,8 +17,6 @@ typedef struct
     bool panicMode;
 } Parser;
 
-Parser parser;
-
 typedef enum
 {
     PREC_NONE,
@@ -43,6 +41,21 @@ typedef struct
     Precedence precedence;
 } ParseRule;
 
+typedef struct
+{
+    Token name;
+    int depth;
+} Local;
+
+typedef struct
+{
+    Local locals[UINT8_COUNT];
+    int localCount;
+    int scopeDepth;
+} Compiler;
+
+Parser parser;
+Compiler *current = NULL;
 Chunk *compilingChunk;
 
 static Chunk *currentChunk()
@@ -155,6 +168,13 @@ static void emitConstant(Value value)
     emitBytes(OP_CONSTANT, makeConstant(value));
 }
 
+static void initCompiler(Compiler *compiler)
+{
+    compiler->localCount = 0;
+    compiler->scopeDepth = 0;
+    current = compiler;
+}
+
 static void endCompiler()
 {
     emitReturn();
@@ -171,7 +191,7 @@ static void statement();
 static void declaration();
 static ParseRule *getRule(TokenType type);
 static void parsePrecedence(Precedence precedence);
-static uint8_t identifierConstant(Token* name);
+static uint8_t identifierConstant(Token *name);
 
 static void binary(bool canAssign)
 {
@@ -251,18 +271,23 @@ static void string(bool canAssign)
     emitConstant(OBJ_VAL(copyString(parser.previous.start + 1, parser.previous.length - 2)));
 }
 
-static void namedVariable(Token name, bool canAssign) {
+static void namedVariable(Token name, bool canAssign)
+{
     uint8_t arg = identifierConstant(&name);
 
-    if (canAssign && match(TOKEN_EQUAL)) {
+    if (canAssign && match(TOKEN_EQUAL))
+    {
         expression();
         emitBytes(OP_SET_GLOBAL, arg);
-    } else {
+    }
+    else
+    {
         emitBytes(OP_GET_GLOBAL, arg);
     }
 }
 
-static void variable(bool canAssign) {
+static void variable(bool canAssign)
+{
     namedVariable(parser.previous, canAssign);
 }
 
@@ -350,21 +375,25 @@ static void parsePrecedence(Precedence precedence)
         infixRule(canAssign);
     }
 
-    if (canAssign && match(TOKEN_EQUAL)) {
+    if (canAssign && match(TOKEN_EQUAL))
+    {
         error("Invalid assignment target.");
     }
 }
 
-static uint8_t identifierConstant(Token* name) {
+static uint8_t identifierConstant(Token *name)
+{
     return makeConstant(OBJ_VAL(copyString(name->start, name->length)));
 }
 
-static uint8_t parseVariable(const char* errorMessage) {
+static uint8_t parseVariable(const char *errorMessage)
+{
     consume(TOKEN_IDENTIFIER, errorMessage);
     return identifierConstant(&parser.previous);
 }
 
-static void defineVariable(uint8_t global) {
+static void defineVariable(uint8_t global)
+{
     emitBytes(OP_DEFINE_GLOBAL, global);
 }
 
@@ -378,12 +407,16 @@ static void expression()
     parsePrecedence(PREC_ASSIGNMENT);
 }
 
-static void varDeclaration() {
+static void varDeclaration()
+{
     uint8_t global = parseVariable("Expect variable name.");
 
-    if(match(TOKEN_EQUAL)) {
+    if (match(TOKEN_EQUAL))
+    {
         expression();
-    } else {
+    }
+    else
+    {
         emitByte(OP_NIL);
     }
     consume(TOKEN_SEMICOLON, "Expect ';' after variable declaration.");
@@ -433,9 +466,12 @@ static void synchronize()
 
 static void declaration()
 {
-    if(match(TOKEN_VAR)) {
+    if (match(TOKEN_VAR))
+    {
         varDeclaration();
-    } else {
+    }
+    else
+    {
         statement();
     }
 
@@ -459,6 +495,8 @@ static void statement()
 bool compile(const char *source, Chunk *chunk)
 {
     initScanner(source);
+    Compiler compiler;
+    initCompiler(&compiler);
     compilingChunk = chunk;
 
     parser.hadError = false;
