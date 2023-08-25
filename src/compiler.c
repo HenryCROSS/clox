@@ -55,7 +55,6 @@ typedef struct
     int scopeDepth;
 } Compiler;
 
-static int resolveLocal(Compiler *compiler, Token *name);
 
 Parser parser;
 Compiler *current = NULL;
@@ -210,6 +209,7 @@ static void statement();
 static void declaration();
 static ParseRule *getRule(TokenType type);
 static void parsePrecedence(Precedence precedence);
+static int resolveLocal(Compiler *compiler, Token *name);
 static uint8_t identifierConstant(Token *name);
 
 static void binary(bool canAssign)
@@ -483,7 +483,7 @@ static uint8_t parseVariable(const char *errorMessage)
 {
     consume(TOKEN_IDENTIFIER, errorMessage);
 
-    declaration();
+    declareVariable();
     if (current->scopeDepth > 0)
         return 0;
 
