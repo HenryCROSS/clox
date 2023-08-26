@@ -149,9 +149,10 @@ static void emitBytes(uint8_t byte1, uint8_t byte2)
 
 static int emitJump(uint8_t instruction)
 {
-    emitByte(instruction);
-    emitByte(0xff); // 16-bit offset
-    emitByte(0xff);
+    emitByte(instruction); // 1 byte
+    emitByte(0xff); // 16-bit offset (2 bytes)
+    emitByte(0xff); // for how far to skip to the next
+                    // branch
     return currentChunk()->count - 2;
 }
 
