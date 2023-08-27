@@ -245,6 +245,7 @@ static ParseRule *getRule(TokenType type);
 static void parsePrecedence(Precedence precedence);
 static int resolveLocal(Compiler *compiler, Token *name);
 static uint8_t identifierConstant(Token *name);
+static void and_(bool canAssign);
 
 static void binary(bool canAssign)
 {
