@@ -607,25 +607,6 @@ static uint8_t argumentList()
     return argCount;
 }
 
-static uint8_t argumentList()
-{
-    uint8_t argCount = 0;
-    if (!check(TOKEN_RIGHT_PAREN))
-    {
-        do
-        {
-            expression();
-            if (argCount == 255)
-            {
-                error("Can't have more than 255 arguments.");
-            }
-            argCount++;
-        } while (match(TOKEN_COMMA));
-    }
-    consume(TOKEN_RIGHT_PAREN, "Expect ')' after arguments.");
-    return argCount;
-}
-
 static void and_(bool canAssign)
 {
     int endJump = emitJump(OP_JUMP_IF_FALSE);
