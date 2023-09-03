@@ -5,4 +5,6 @@ fun outer() {
   }
   inner();
 }
-outer();
+var a = outer();
+
+
