@@ -67,7 +67,7 @@ typedef struct Compiler {
 Parser parser;
 Compiler *current = NULL;
 
-static Chunk *currentChunk() { return &current->function->chunk; }
+static Chunk *currentChunk(void) { return &current->function->chunk; }
 
 static void errorAt(Token *token, const char *message) {
   if (parser.panicMode)
@@ -93,7 +93,7 @@ static void errorAtCurrent(const char *message) {
   errorAt(&parser.current, message);
 }
 
-static void advance() {
+static void advance(void) {
   parser.previous = parser.current;
 
   for (;;) {
@@ -151,7 +151,7 @@ static int emitJump(uint8_t instruction) {
   return currentChunk()->count - 2;
 }
 
-static void emitReturn() {
+static void emitReturn(void) {
   emitByte(OP_NIL); // if no return value
   emitByte(OP_RETURN);
 }
@@ -202,7 +202,7 @@ static void initCompiler(Compiler *compiler, FunctionType type) {
   local->name.length = 0;
 }
 
-static ObjFunction *endCompiler() {
+static ObjFunction *endCompiler(void) {
   emitReturn();
   ObjFunction *function = current->function;
 
@@ -218,9 +218,9 @@ static ObjFunction *endCompiler() {
   return function;
 }
 
-static void beginScope() { current->scopeDepth++; }
+static void beginScope(void) { current->scopeDepth++; }
 
-static void endScope() {
+static void endScope(void) {
   current->scopeDepth--;
 
   while (current->localCount > 0 &&
@@ -699,7 +699,7 @@ static void forStatement() {
   endScope();
 }
 
-static void ifStatement() {
+static void ifStatement(void) {
   consume(TOKEN_LEFT_PAREN, "Expect '(' after 'if'.");
   expression();
   consume(TOKEN_RIGHT_PAREN, "Expect ')' after condition.");
@@ -718,13 +718,13 @@ static void ifStatement() {
   patchJump(elseJump);
 }
 
-static void printStatement() {
+static void printStatement(void) {
   expression();
   consume(TOKEN_SEMICOLON, "Expect ';' after value");
   emitByte(OP_PRINT);
 }
 
-static void returnStatement() {
+static void returnStatement(void) {
   if (current->type == TYPE_SCRIPT) {
     error("Can't return from top-level code.");
   }
@@ -738,7 +738,7 @@ static void returnStatement() {
   }
 }
 
-static void whileStatement() {
+static void whileStatement(void) {
   int loopStart = currentChunk()->count;
   consume(TOKEN_LEFT_PAREN, "Expect '(' after 'while'.");
   expression();
@@ -753,7 +753,7 @@ static void whileStatement() {
   emitByte(OP_POP);
 }
 
-static void synchronize() {
+static void synchronize(void) {
   parser.panicMode = false;
 
   while (parser.current.type != TOKEN_EOF) {
@@ -777,7 +777,7 @@ static void synchronize() {
   }
 }
 
-static void declaration() {
+static void declaration(void) {
   if (match(TOKEN_FUN)) {
     funDeclaration();
   } else if (match(TOKEN_VAR)) {
@@ -790,7 +790,7 @@ static void declaration() {
     synchronize();
 }
 
-static void statement() {
+static void statement(void) {
   if (match(TOKEN_PRINT)) {
     printStatement();
   } else if (match(TOKEN_FOR)) {
@@ -829,7 +829,7 @@ ObjFunction *compile(const char *source) {
   return parser.hadError ? NULL : function;
 }
 
-void markCompilerRoots() {
+void markCompilerRoots(void) {
   Compiler *compiler = current;
   while (compiler != NULL) {
     markObject((Obj *)compiler->function);

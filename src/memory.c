@@ -134,11 +134,9 @@ static void freeObject(Obj *object) {
     FREE(ObjUpvalue, object);
     break;
   }
-
-  free(vm.grayStack);
 }
 
-static void markRoots() {
+static void markRoots(void) {
   for (Value *slot = vm.stack; slot < vm.stackTop; slot++) {
     markValue(*slot);
   }
@@ -156,14 +154,14 @@ static void markRoots() {
   markCompilerRoots();
 }
 
-static void traceReferences() {
+static void traceReferences(void) {
   while (vm.grayCount > 0) {
     Obj *object = vm.grayStack[--vm.grayCount];
     blackenObject(object);
   }
 }
 
-static void sweep() {
+static void sweep(void) {
   Obj *previous = NULL;
   Obj *object = vm.objects;
   while (object != NULL) {
@@ -185,7 +183,7 @@ static void sweep() {
   }
 }
 
-void collectGarbage() {
+void collectGarbage(void) {
 #ifdef DEBUG_LOG_GC
   printf("-- gc begin\n");
   size_t before = vm.bytesAllocated;
@@ -205,11 +203,13 @@ void collectGarbage() {
 #endif
 }
 
-void freeObjects() {
+void freeObjects(void) {
   Obj *object = vm.objects;
   while (object != NULL) {
     Obj *next = object->next;
     freeObject(object);
     object = next;
   }
+
+  free(vm.grayStack);
 }
